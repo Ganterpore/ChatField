@@ -58,15 +58,14 @@ public class AccountController {
      * @return a task that is authorising the user.
      */
     public static Task<AuthResult> signup(final String firstname, final String lastname,
-                                          final String number, final String bio, final boolean helper,
-                                          final String email, String password) {
+                                          final String bio, final String email, String password) {
         FirebaseAuth authoriser = getAuthoriserInstance();
         //signing up user
         Task<AuthResult> accountCreation = authoriser.createUserWithEmailAndPassword(email,password);
 
         //adding user details to the database if the account is successfully authenticated
         controller = new AccountController();
-        controller.handleNewUser(accountCreation, firstname, lastname, email, number, bio, helper);
+        controller.handleNewUser(accountCreation, firstname, lastname, email, bio);
 
         return accountCreation;
     }
@@ -77,7 +76,7 @@ public class AccountController {
      * used for logging in a user who has already created an account
      * @param email,    the email used when setting up the account
      * @param password, the users password
-     * @return an assosciated task that is signing in a user
+     * @return an associated task that is signing in a user
      */
     public static Task<AuthResult> login(String email, String password) {
         FirebaseAuth authoriser = getAuthoriserInstance();
@@ -157,14 +156,13 @@ public class AccountController {
      * @param email, the account owners email
      */
     private void handleNewUser(Task<AuthResult> accountCreation, final String firstname,
-                               final String lastname, final String email, final String number,
-                               final String bio, final boolean helper) {
+                               final String lastname, final String email, final String bio) {
         accountCreation.addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete (@NonNull Task <AuthResult> task) {
                 if (task.isSuccessful()) {
                     String uid = task.getResult().getUser().getUid();
-                    controller.updateUser(uid, firstname, lastname, email, number, bio, helper);
+                    controller.updateUser(uid, firstname, lastname, email, bio);
                 }
             }
         });
@@ -174,10 +172,9 @@ public class AccountController {
      * adds/updates a user in the firestore database
      * will also assign the user to the userAccount field
      */
-    public void updateUser(String uid, String firstname, String lastname, String email,
-                           String number, String bio, boolean helper) {
+    public void updateUser(String uid, String firstname, String lastname, String email, String bio) {
         //creating account
-        Account user = new Account(uid, firstname, lastname, email, number, bio, helper);
+        Account user = new Account(uid, firstname, lastname, email, bio);
 
         //adding account to database, and setting the userAccount variable
         DocumentReference userRow = db.collection(USER_BRANCH).document(uid);
@@ -270,7 +267,7 @@ public class AccountController {
     }
 
     //For if we need a specific user created...
-    public Account getUserAccount(String my_user) {
+    public Account getContactAccount(String my_user) {
         if(isLoggedOn() && my_user.equals(uid)) {
             return getUserAccount();
         } else {
@@ -317,26 +314,43 @@ public class AccountController {
     public static final String CONTACT_BRANCH = "contacts";
     public static final String REQUEST_BRANCH = "requests";
     /**
-     * returns a query to the list of contacts assosciated with the current user.
+     * returns a query to the list of contacts associated with the current user.
      * A Query can be used to fill a recycler view.
      * For usage example, See https://github.com/ennur/FirestoreRecyclerAdapterSample
      * @return a query for the contacts
      */
     public Query getContacts() {
-        return db
+        Query contacts = db
                 .collection(USER_BRANCH)
                 .document(uid)
                 .collection(CONTACT_BRANCH)
                 .orderBy("lastname");
+//        cleanContacts(contacts);
+        return contacts;
     }
+
     /**
-     * returns a query to the list of people near the current user
-     * A Query can be used to fill a recycler view.
-     * For usage example, See https://github.com/ennur/FirestoreRecyclerAdapterSample
-     * @return the closest people
+     * makes sure the current contact details matches the details of the user account on the database.
+     * @param contacts a query containing all the contacts to clean.
      */
-    public Query getLocals() {
-        return db.collection(USER_BRANCH).whereEqualTo("helper", true).orderBy("lastname");
+    private void cleanContacts(Query contacts) {
+        contacts.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if(task.isSuccessful()) {
+                    List<DocumentSnapshot> documents = task.getResult().getDocuments();
+                    for(DocumentSnapshot doc : documents) {
+                        String contactID = (String) doc.get("userID");
+                        Account contactDetails = getContactAccount(contactID);
+                        if(!contactDetails.getFirstname().equals(doc.get("firstname"))
+                                || !contactDetails.getLastname().equals(doc.get("lastname"))) {
+                            updateContactDetails(contactID, contactDetails.getFirstname(),
+                                    contactDetails.getLastname());
+                        }
+                    }
+                }
+            }
+        });
     }
 
     /**
@@ -398,6 +412,14 @@ public class AccountController {
                         }
                     }
                 });
+    }
+
+    private void updateContactDetails(String contactID, String firstname, String lastname) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("firstname", firstname);
+        data.put("lastname", lastname);
+        db.collection(USER_BRANCH).document(uid).collection(CONTACT_BRANCH).document(contactID)
+                .set(data, SetOptions.merge());
     }
 
     public Contact getContact(String contactID) throws ExecutionException, InterruptedException {

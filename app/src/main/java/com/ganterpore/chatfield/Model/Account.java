@@ -9,19 +9,14 @@ public class Account {
     private String firstname;
     private String lastname;
     private String email;
-    private String number;
     private String bio;
-    private boolean helper;
 
-    public Account(String userID, String firstname, String lastname, String email,
-                   String number, String bio, boolean helper) {
+    public Account(String userID, String firstname, String lastname, String email, String bio) {
         this.userID = userID;
         this.firstname = firstname;
         this.lastname = lastname;
         this.email = email;
-        this.number = number;
         this.bio = bio;
-        this.helper = helper;
     }
 
     public Account(DocumentSnapshot document) {
@@ -50,23 +45,10 @@ public class Account {
                     this.email = email.toString();
                 }
             }
-            if(document.contains("number")) {
-                Object number = document.get("number");
-                if(number != null){
-                    this.number = number.toString();
-                }
-            }
             if(document.contains("bio")) {
                 Object bio = document.get("bio");
                 if(bio != null){
                     this.bio = bio.toString();
-                }
-            }
-            if(document.contains("helper")) {
-                try {
-                    this.helper = document.getBoolean("helper");
-                } catch (NullPointerException e) {
-                    e.printStackTrace();
                 }
             }
         }
@@ -107,14 +89,6 @@ public class Account {
         this.email = email;
     }
 
-    public String getNumber() {
-        return number;
-    }
-
-    public void setNumber(String number) {
-        this.number = number;
-    }
-
     public String getBio() {
         return bio;
     }
@@ -123,11 +97,4 @@ public class Account {
         this.bio = bio;
     }
 
-    public boolean isHelper() {
-        return helper;
-    }
-
-    public void setHelper(boolean helper) {
-        this.helper = helper;
-    }
 }
