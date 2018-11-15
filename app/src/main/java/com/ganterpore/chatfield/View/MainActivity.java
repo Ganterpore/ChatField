@@ -2,6 +2,7 @@ package com.ganterpore.chatfield.View;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -20,26 +21,33 @@ import com.ganterpore.chatfield.Controller.AccountController;
 import com.ganterpore.chatfield.Model.Contact;
 import com.ganterpore.chatfield.R;
 
+import java.util.ArrayList;
+
 import static com.ganterpore.chatfield.View.ChatActivity.CONVERSATION_ID;
 
-public class MainActivity extends AppCompatActivity implements ContactListFragment.OnFragmentInteractionListener {
+public class MainActivity extends AppCompatActivity
+        implements ContactListFragment.OnFragmentInteractionListener,
+        AccountInfoFragment.OnFragmentInteractionListener {
 
     private TextView mTextMessage;
     private int currentView;
 
     private AccountController accountController;
 
+    private ArrayList<View> onScreenViews = new ArrayList<>();
+
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            if(item.getItemId() == currentView) {
-                return false;
-            }
+//            if(item.getItemId() == currentView) {
+//                return false;
+//            }
             switch (item.getItemId()) {
                 case R.id.navigation_chats:
 
+                    openChats();
                     currentView = R.id.navigation_chats;
                     return true;
                 case R.id.navigation_contacts:
@@ -49,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements ContactListFragme
                     return true;
                 case R.id.navigation_account:
 
+                    openAccount();
                     currentView = R.id.navigation_account;
                     return true;
             }
@@ -76,7 +85,29 @@ public class MainActivity extends AppCompatActivity implements ContactListFragme
         }
     }
 
+    public void clearScreen() {
+        for(View view : onScreenViews) {
+            if(view instanceof FloatingActionButton) {
+                ((FloatingActionButton) view).hide();
+            } else {
+                view.setVisibility(View.GONE);
+            }
+        }
+        onScreenViews.clear();
+    }
+
+    private void openAccount() {
+        clearScreen();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+        AccountInfoFragment accountInfo = AccountInfoFragment.viewSelfInfo();
+        fragmentTransaction.replace(R.id.screen_content, accountInfo);
+        fragmentTransaction.commit();
+    }
+
     private void openContacts() {
+        clearScreen();
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
@@ -87,6 +118,16 @@ public class MainActivity extends AppCompatActivity implements ContactListFragme
         //TODO add animation
         FloatingActionButton addContactButton = findViewById(R.id.add_contact);
         addContactButton.show();
+        onScreenViews.add(addContactButton);
+    }
+
+    private void openChats() {
+        clearScreen();
+//        FragmentManager fragmentManager = getSupportFragmentManager();
+//        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+//
+//        fragmentTransaction.replace(R.id.screen_content, null);
+//        fragmentTransaction.commit();
     }
 
     public void addContact(View view) {
@@ -111,10 +152,44 @@ public class MainActivity extends AppCompatActivity implements ContactListFragme
 
     @Override
     public void onContactSelected(Contact contact) {
+//        FragmentManager fragmentManager = getSupportFragmentManager();
+//        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+//
+//        AccountInfoFragment accountInfo = AccountInfoFragment.viewContactInfo(
+//                contact.getUserID(), contact.getConversationID());
+//        fragmentTransaction.replace(R.id.screen_content, accountInfo);
+//        fragmentTransaction.commit();
+//
+            Intent intent = new Intent(this, AccountInfoActivity.class);
+            intent.putExtra("contact", contact.getUserID());
+            intent.putExtra("conversationID", contact.getConversationID());
+            startActivity(intent);
+    }
+
+    @Override
+    public void onChatSelected(String contactID, String conversationID) {
         Intent intent = new Intent(this, ChatActivity.class);
-        intent.putExtra(ChatActivity.CONVERSATION_ID, contact.getConversationID());
-        intent.putExtra(ChatActivity.CONTACT_ID, contact.getUserID());
-        intent.putExtra("name", contact.getFirstname() + " " + contact.getLastname());
+        intent.putExtra(ChatActivity.CONVERSATION_ID, conversationID);
+        intent.putExtra(ChatActivity.CONTACT_ID, contactID);
+//        intent.putExtra("name", contact.getFirstname() + " " + contact.getLastname());
         startActivity(intent);
+    }
+
+    @Override
+    public void logout() {
+        accountController.logout();
+        startActivity(new Intent(this, LoginActivity.class));
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(currentView != R.id.navigation_chats) {
+            BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+            navigation.setSelectedItemId(R.id.navigation_chats);
+            currentView = R.id.navigation_chats;
+            openChats();
+        } else {
+            super.onBackPressed();
+        }
     }
 }

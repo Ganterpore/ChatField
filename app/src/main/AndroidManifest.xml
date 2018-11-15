@@ -34,7 +34,7 @@
             android:name=".View.LoginActivity"
             android:label="@string/title_activity_login" />
         <activity android:name=".View.ConfigureUserActivity" />
-        <activity android:name=".View.ChatActivity"></activity>
+        <activity android:name=".View.ChatActivity" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -45,8 +45,8 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
+        <activity android:name=".View.AccountInfoActivity"></activity>
     </application>
-
-
 
 </manifest>
