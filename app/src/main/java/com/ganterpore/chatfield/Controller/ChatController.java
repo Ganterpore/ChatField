@@ -20,6 +20,8 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -30,7 +32,6 @@ public class ChatController {
     public static final String IMAGE_BRANCH = "images";
 
     private String senderID;
-    private String receiverID;
     private String conversationID;
 
     private int userNumber;
@@ -60,20 +61,9 @@ public class ChatController {
                 .document(conversationID).get();
         Tasks.await(getConversation);
         DocumentSnapshot conversation = getConversation.getResult();
-        //getting recieverID
-        if(chat.senderID.equals(conversation.get("user1ID"))) {
-            chat.userNumber = 1;
-            Object user2 = conversation.get("user2ID");
-            if(user2 != null) {
-                chat.receiverID = user2.toString();
-            }
-        } else {
-            chat.userNumber = 2;
-            Object user1 = conversation.get("user1ID");
-            if(user1 != null) {
-                chat.receiverID = user1.toString();
-            }
-        }
+        ArrayList<String> users = (ArrayList<String>) conversation.get("users");
+        chat.userNumber = users.indexOf(chat.senderID);//Arrays.asList(users).indexOf(chat.senderID);//.binarySearch(users, chat.senderID);
+
         //when chat opened, mark it as read
         chat.markAsRead();
         return chat;
@@ -85,72 +75,29 @@ public class ChatController {
     }
 
     /**
-     * Called when a conversationID is between two users, will either find an existing chat, or
-     * make a new one between the users
-     * @param user1ID the first user
-     * @param user2ID the second user
-     * @return a conversationID of a new or already existing conversation
-     * @throws ExecutionException when something goes wrong in execution
-     * @throws InterruptedException when the process is interrupted
-     */
-    public static String findOrBuildConversation(String user1ID, String user2ID)
-            throws ExecutionException, InterruptedException {
-        final FirebaseFirestore db = getDatabaseInstance();
-
-        //getting a pre-existing conversation between the two users
-        Task<QuerySnapshot> conversationQuery = db.collection(CONVERSATION_BRANCH)
-                .whereEqualTo("user1ID", user1ID).whereEqualTo("user2ID", user2ID).get();
-        Tasks.await(conversationQuery);
-        //get all the conversations
-        QuerySnapshot conversations = conversationQuery.getResult();
-        //if there are conversations, return the id from the first one
-        if (!conversations.isEmpty()) {
-            return conversations.getDocuments().get(0).getId();
-        }
-        //if there aren't any, try a conversation with the other user order
-        else {
-            Task<QuerySnapshot> conversationQuery2 = db.collection(CONVERSATION_BRANCH)
-                    .whereEqualTo("user1ID", user2ID).whereEqualTo("user2ID", user1ID).get();
-            Tasks.await(conversationQuery2);
-            //get all the conversations
-            QuerySnapshot conversations2 = conversationQuery2.getResult();
-            //if there are conversations, return the id from the first one
-            if (!conversations2.isEmpty()) {
-                return conversations2.getDocuments().get(0).getId();
-            }
-        }
-
-        //if we reach this point, no conversation is currently set up
-        // therefore we must make a new convo
-        Chat chat = new Chat(user1ID, user2ID);
-        chat.setUser1Seen(true);
-        chat.setUser2Seen(true);
-        Task<DocumentReference> newChat = db.collection(CONVERSATION_BRANCH).add(chat);
-        Tasks.await(newChat);
-        return newChat.getResult().getId();
-    }
-
-    /**
      * used to mark the conversation as read
      */
     public void markAsRead() {
-        Map<String, Boolean> data = new HashMap<>();
-        //if its a conversation with yourself, mark both as read
-        if(receiverID.equals(senderID)) {
-            data.put("user1Seen", true);
-            data.put("user2Seen", true);
-        }
-        //otherwise only mark the current user as read
-        else if(userNumber == 1) {
-            data.put("user1Seen", true);
-        } else {
-            data.put("user2Seen", true);
-        }
-        updateConversation(data);
-    }
+        //TODO solve concurrent read receipts
+        //get the current read table from the database
+        db.collection(CONVERSATION_BRANCH).document(conversationID).get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if(task.isSuccessful()) {
+                    //update current user to read
+                    DocumentSnapshot result = task.getResult();
+                    ArrayList<Boolean> seen = (ArrayList<Boolean>) result.get("seen");
+                    seen.set(userNumber, true);
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("seen", seen);
+                    db.collection(CONVERSATION_BRANCH).document(conversationID)
+                            .set(data, SetOptions.merge());
 
-    private void updateConversation(Map<String, Boolean> data) {
-        db.collection(CONVERSATION_BRANCH).document(conversationID).set(data, SetOptions.merge());
+                }
+            }
+        });
+
     }
 
     /**
@@ -234,10 +181,6 @@ public class ChatController {
     public Query getAllMessages() {
         return db.collection(CONVERSATION_BRANCH).document(conversationID)
                 .collection(MESSAGE_BRANCH).orderBy("sentAt");
-    }
-
-    public String getReceiverID() {
-        return receiverID;
     }
 
     public String getConversationID() {
