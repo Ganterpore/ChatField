@@ -17,7 +17,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.ganterpore.chatfield.Controller.AccountController;
+import com.ganterpore.chatfield.Model.Contact;
 import com.ganterpore.chatfield.R;
+
+import static com.ganterpore.chatfield.View.ChatActivity.CONVERSATION_ID;
 
 public class MainActivity extends AppCompatActivity implements ContactListFragment.OnFragmentInteractionListener {
 
@@ -31,13 +34,16 @@ public class MainActivity extends AppCompatActivity implements ContactListFragme
 
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            if(item.getItemId() == currentView) {
+                return false;
+            }
             switch (item.getItemId()) {
                 case R.id.navigation_chats:
 
                     currentView = R.id.navigation_chats;
                     return true;
                 case R.id.navigation_contacts:
-
+//
                     openContacts();
                     currentView = R.id.navigation_contacts;
                     return true;
@@ -71,13 +77,11 @@ public class MainActivity extends AppCompatActivity implements ContactListFragme
     }
 
     private void openContacts() {
-//        Intent intent = new Intent(this, ContactList.class);
-//        startActivity(intent);
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
         ContactListFragment contactList = ContactListFragment.newInstance();
-        fragmentTransaction.add(R.id.screen_content, contactList, "contacts_content");
+        fragmentTransaction.replace(R.id.screen_content, contactList);
         fragmentTransaction.commit();
 
         //TODO add animation
@@ -86,11 +90,11 @@ public class MainActivity extends AppCompatActivity implements ContactListFragme
     }
 
     public void addContact(View view) {
-        //creating a pop up window confirming the call
+        //inflating the contact request view
         LayoutInflater layoutInflater = LayoutInflater.from(this);
         View addContactLayout = layoutInflater.inflate(R.layout.add_contact_dialogue_box, null);
         final EditText emailEt = addContactLayout.findViewById(R.id.enter_email);
-
+        //building the alert dialogue
         AlertDialog.Builder addContactAlert = new AlertDialog.Builder(this);
         addContactAlert.setTitle("Add contact");
         addContactAlert.setView(addContactLayout);
@@ -101,31 +105,16 @@ public class MainActivity extends AppCompatActivity implements ContactListFragme
                 accountController.requestContact(emailEt.getText().toString());
             }
         });
-
+        //displaying the dialogue to the UI
         addContactAlert.create().show();
-
-//        final PopupWindow popupWindow = new PopupWindow(addContactLayout,
-//                FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT,
-//                true);
-//        popupWindow.setOutsideTouchable(true);
-////        popupWindow.setAnimationStyle(R.style.MyPopupWindow_anim_style);
-//
-//        // PopupWindow pop up position
-//        final View activityContent = findViewById(android.R.id.content);
-//        popupWindow.showAtLocation(activityContent,
-//                Gravity.CENTER, 0, 0);
-//        activityContent.setAlpha(0.5f);
-//        popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
-//            @Override
-//            public void onDismiss() {
-//                //when the popup window is closed, remove the transparency
-//                activityContent.setAlpha(1f);
-//            }
-//        });
     }
 
     @Override
-    public void onFragmentInteraction(View view) {
-
+    public void onContactSelected(Contact contact) {
+        Intent intent = new Intent(this, ChatActivity.class);
+        intent.putExtra(ChatActivity.CONVERSATION_ID, contact.getConversationID());
+        intent.putExtra(ChatActivity.CONTACT_ID, contact.getUserID());
+        intent.putExtra("name", contact.getFirstname() + " " + contact.getLastname());
+        startActivity(intent);
     }
 }

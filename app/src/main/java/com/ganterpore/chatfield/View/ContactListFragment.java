@@ -56,12 +56,6 @@ public class ContactListFragment extends Fragment {
         return view;
     }
 
-    public void onButtonPressed(View view) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(view);
-        }
-    }
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -173,16 +167,14 @@ public class ContactListFragment extends Fragment {
     }
 
     public interface OnFragmentInteractionListener {
-        void onFragmentInteraction(View view);
+        void onContactSelected(Contact contact);
     }
 
     public class ContactListViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         View itemView;
         Context context;
-        String contactID;
-        String conversationID;
-        String contactName;
+        Contact contact;
 
         /**
          * Public Constructor
@@ -200,14 +192,11 @@ public class ContactListFragment extends Fragment {
          * @param contact The contact to be used
          */
         public void initialiseDisplay(final Contact contact) {
-
-            contactID = contact.getUserID();
-            conversationID = contact.getConversationID();
-            contactName = contact.getFirstname() + " " + contact.getLastname();
+            this.contact = contact;
 
             //XML fragments
             TextView contactNameView = itemView.findViewById(R.id.list_contact_name);
-            contactNameView.setText(contactName);
+            contactNameView.setText(contact.getFirstname() + " " + contact.getLastname());
 //            Button messageButton = itemView.findViewById(R.id.contact_message_button);
 //            messageButton.setOnClickListener(new View.OnClickListener() {
 //                @Override
@@ -242,6 +231,7 @@ public class ContactListFragment extends Fragment {
 //            intent.putExtra("contact", contactID);
 //            intent.putExtra("conversationID", conversationID);
 //            startActivity(intent);
+            mListener.onContactSelected(contact);
         }
     }
 

@@ -9,8 +9,6 @@
         android:id="@+id/list_request_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_centerVertical="true"
         android:layout_marginStart="20dp"
         android:text="name"
         android:textSize="20sp" />
