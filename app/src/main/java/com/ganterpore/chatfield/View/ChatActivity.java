@@ -21,8 +21,6 @@ public class ChatActivity extends AppCompatActivity implements ChatFragment.OnFr
     public static final String NAME = "name";
     public static final int CAMERA_RESULT = 1;
 
-    private String contactId;
-    private String contactName;
     private ChatFragment chat;
 
     @Override
@@ -32,13 +30,9 @@ public class ChatActivity extends AppCompatActivity implements ChatFragment.OnFr
 
         Intent intent = getIntent();
         String conversationId = intent.getStringExtra(CONVERSATION_ID);
-        contactId = intent.getStringExtra(CONTACT_ID);
-        contactName = intent.getStringExtra(NAME);
 
         ActionBar bar = getSupportActionBar();
-        if(contactName!=null && bar!=null) {
-            bar.setTitle(contactName);
-        }
+        //TODO get conversation details and add title to toolbar
 
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         chat = ChatFragment.newInstance(conversationId);

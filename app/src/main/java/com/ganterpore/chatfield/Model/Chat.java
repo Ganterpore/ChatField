@@ -1,48 +1,105 @@
 package com.ganterpore.chatfield.Model;
 
-public class Chat {
-    String user1ID;
-    String user2ID;
-    Boolean user1Seen;
-    Boolean user2Seen;
+import com.google.firebase.firestore.DocumentSnapshot;
 
-    public Chat(String user1ID, String user2ID) {
-        this.user1ID = user1ID;
-        this.user2ID = user2ID;
+public class Chat {
+    private  String name;
+    private long lastMessageSentAt;
+    private String conversationID;
+    private boolean seen;
+    private String type;
+
+    public Chat(String name, long lastMessageSentAt, String conversationID, boolean seen, String type) {
+        this.name = name;
+        this.lastMessageSentAt = lastMessageSentAt;
+        this.conversationID = conversationID;
+        this.seen = seen;
+        this.type = type;
     }
 
     public Chat() {
     }
 
-    public String getUser1ID() {
-        return user1ID;
+    public Chat(DocumentSnapshot doc) {
+        if(doc.exists()) {
+            if(doc.contains("name")) {
+                Object name = doc.get("name");
+                this.name = (String) name;
+            }
+            if(doc.contains("lastMessageSentAt")) {
+                Object lastMessageSentAt = doc.get("lastMessageSentAt");
+                this.lastMessageSentAt = (long) lastMessageSentAt;
+            }
+            if(doc.contains("conversationID")) {
+                Object conversationID = doc.get("conversationID");
+                this.conversationID = (String) conversationID;
+            }
+            if(doc.contains("seen")) {
+                Object seen = doc.get("seen");
+                this.seen = (boolean) seen;
+            }
+            if(doc.contains("type")) {
+                Object type = doc.get("type");
+                this.type = (String) type;
+            }
+        }
     }
 
-    public void setUser1ID(String user1ID) {
-        this.user1ID = user1ID;
+    public String getName() {
+        return name;
     }
 
-    public String getUser2ID() {
-        return user2ID;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public void setUser2ID(String user2ID) {
-        this.user2ID = user2ID;
+    public long getLastMessageSentAt() {
+        return lastMessageSentAt;
     }
 
-    public Boolean getUser1Seen() {
-        return user1Seen;
+    public void setLastMessageSentAt(long lastMessageSentAt) {
+        this.lastMessageSentAt = lastMessageSentAt;
     }
 
-    public void setUser1Seen(Boolean user1Seen) {
-        this.user1Seen = user1Seen;
+//    public void setLastMessageSentAt(String lastMessageSentAt) {
+//        this.lastMessageSentAt = Long.parseLong(lastMessageSentAt);
+//    }
+
+    public String getConversationID() {
+        return conversationID;
     }
 
-    public Boolean getUser2Seen() {
-        return user2Seen;
+    public void setConversationID(String conversationID) {
+        this.conversationID = conversationID;
     }
 
-    public void setUser2Seen(Boolean user2Seen) {
-        this.user2Seen = user2Seen;
+    public boolean isSeen() {
+        return seen;
+    }
+
+    public void setSeen(boolean seen) {
+        this.seen = seen;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(!(obj instanceof Chat)) {
+            return false;
+        } else {
+            Chat other = (Chat) obj;
+            return     this.name.equals(other.getName())
+                    && this.lastMessageSentAt == other.getLastMessageSentAt()
+                    && this.conversationID.equals(other.getConversationID())
+                    && this.seen == other.isSeen()
+                    && this.type.equals(other.getType());
+        }
     }
 }

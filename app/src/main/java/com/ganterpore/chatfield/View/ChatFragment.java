@@ -165,7 +165,9 @@ public class ChatFragment extends Fragment {
         chatController.getAllMessages().addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                mListener.onMessageReceived();
+                if(mListener != null) {
+                    mListener.onMessageReceived();
+                }
             }
         });
 

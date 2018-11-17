@@ -2,7 +2,6 @@ package com.ganterpore.chatfield.View;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -23,11 +22,10 @@ import com.ganterpore.chatfield.R;
 
 import java.util.ArrayList;
 
-import static com.ganterpore.chatfield.View.ChatActivity.CONVERSATION_ID;
-
 public class MainActivity extends AppCompatActivity
         implements ContactListFragment.OnFragmentInteractionListener,
-        AccountInfoFragment.OnFragmentInteractionListener {
+        AccountInfoFragment.OnFragmentInteractionListener,
+        ChatListFragment.OnFragmentInteractionListener {
 
     private TextView mTextMessage;
     private int currentView;
@@ -73,6 +71,8 @@ public class MainActivity extends AppCompatActivity
         mTextMessage = (TextView) findViewById(R.id.message);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
+        openChats();
     }
 
     @Override
@@ -123,11 +123,12 @@ public class MainActivity extends AppCompatActivity
 
     private void openChats() {
         clearScreen();
-//        FragmentManager fragmentManager = getSupportFragmentManager();
-//        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-//
-//        fragmentTransaction.replace(R.id.screen_content, null);
-//        fragmentTransaction.commit();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        ChatListFragment chatListFragment = ChatListFragment.newInstance();
+
+        fragmentTransaction.replace(R.id.screen_content, chatListFragment);
+        fragmentTransaction.commit();
     }
 
     public void addContact(View view) {
@@ -152,14 +153,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onContactSelected(Contact contact) {
-//        FragmentManager fragmentManager = getSupportFragmentManager();
-//        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-//
-//        AccountInfoFragment accountInfo = AccountInfoFragment.viewContactInfo(
-//                contact.getUserID(), contact.getConversationID());
-//        fragmentTransaction.replace(R.id.screen_content, accountInfo);
-//        fragmentTransaction.commit();
-//
             Intent intent = new Intent(this, AccountInfoActivity.class);
             intent.putExtra("contact", contact.getUserID());
             intent.putExtra("conversationID", contact.getConversationID());

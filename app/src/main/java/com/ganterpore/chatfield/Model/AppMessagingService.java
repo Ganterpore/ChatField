@@ -10,9 +10,11 @@ import android.support.v4.app.NotificationCompat;
 
 import com.ganterpore.chatfield.Controller.AccountController;
 import com.ganterpore.chatfield.R;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.functions.FirebaseFunctions;
+import com.google.firebase.functions.HttpsCallableResult;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -96,6 +98,7 @@ public class AppMessagingService extends FirebaseMessagingService {
      * @param receiverEmail of the contact being added
      */
     public static void addContactMessage(String firstname, String lastname, String email, String receiverEmail) {
+        //TODO dont send request if already friends
         Map<String, String> data = new HashMap<>();
         data.put("firstname", firstname);
         data.put("lastname", lastname);
@@ -104,6 +107,7 @@ public class AppMessagingService extends FirebaseMessagingService {
 
         FirebaseFunctions.getInstance()
                 .getHttpsCallable("addContact").call(data);
+
     }
 
     /**

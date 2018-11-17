@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.ganterpore.chatfield.Model.Account;
 import com.ganterpore.chatfield.Model.AppMessagingService;
+import com.ganterpore.chatfield.Model.Chat;
 import com.ganterpore.chatfield.Model.Contact;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -28,6 +29,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -313,6 +315,103 @@ public class AccountController {
 
     public static final String CONTACT_BRANCH = "contacts";
     public static final String REQUEST_BRANCH = "requests";
+    public static final String CONVERSATIONS_BRANCH = "conversations";
+
+    public Query getConversations() {
+        Query conversations = db
+                .collection(USER_BRANCH)
+                .document(uid)
+                .collection(CONVERSATIONS_BRANCH)
+                .orderBy("lastMessageSentAt");
+        //TODO update conversation last sent at when method is called.
+        updateConversations(conversations);
+        return conversations;
+    }
+
+    private void updateConversations(Query conversations) {
+        conversations.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                List<DocumentSnapshot> documents = task.getResult().getDocuments();
+                for(DocumentSnapshot localConvDoc : documents) {
+                    final Chat localConv = new Chat(localConvDoc);
+
+                    //getting seen and name from dataabase
+                    db.collection(ChatController.CONVERSATION_BRANCH)
+                        .document(localConv.getConversationID()).get()
+                        .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                DocumentSnapshot onlineConvDoc = task.getResult();
+                                ArrayList<String> users = (ArrayList<String>) onlineConvDoc.get("users");
+                                ArrayList<Boolean> allSeen  = (ArrayList<Boolean>) onlineConvDoc.get("seen");
+
+                                int index = users.indexOf(uid);
+                                boolean seen = allSeen.get(index);
+                                if(localConv.isSeen() != seen) {
+                                    Map<String, Object> data = new HashMap<>();
+                                    data.put("seen", seen);
+                                    db.collection(USER_BRANCH).document(uid).collection(CONVERSATIONS_BRANCH)
+                                            .document(localConv.getConversationID()).set(data, SetOptions.merge());
+
+                                }
+
+                                //if its a group, get the name from the conversation
+                                //if its a contact, get it from contacts
+                                if(localConv.getType().equals("group")) {
+                                    String name = (String) onlineConvDoc.get("name");
+                                    if(!localConv.getName().equals(name)) {
+                                        Map<String, Object> data = new HashMap<>();
+                                        data.put("name", name);
+                                        db.collection(USER_BRANCH).document(uid).collection(CONVERSATIONS_BRANCH)
+                                                .document(localConv.getConversationID()).set(data, SetOptions.merge());
+                                    }
+                                } else if (localConv.getType().equals("contact")) {
+                                    db.collection(USER_BRANCH).document(uid)
+                                        .collection(CONTACT_BRANCH)
+                                        .whereEqualTo("conversationID",
+                                                localConv.getConversationID()).get()
+                                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                DocumentSnapshot result = task.getResult().getDocuments().get(0);
+                                                String name = result.get("firstname") + " " + result.get("lastname");
+                                                if(!localConv.getName().equals(name)) {
+                                                    Map<String, Object> data = new HashMap<>();
+                                                    data.put("name", name);
+                                                    db.collection(USER_BRANCH).document(uid).collection(CONVERSATIONS_BRANCH)
+                                                            .document(localConv.getConversationID()).set(data, SetOptions.merge());
+                                                }
+                                            }
+                                        });
+                                }
+                            }
+                       });
+
+                    //getting most recent message
+                    db.collection(ChatController.CONVERSATION_BRANCH)
+                            .document(localConv.getConversationID())
+                            .collection(ChatController.MESSAGE_BRANCH)
+                            .orderBy("sentAt", Query.Direction.DESCENDING).limit(1).get()
+                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                    if(task.getResult().getDocuments().size() > 0) {
+                                        long mostRecent = (long) task.getResult().getDocuments().get(0).get("sentAt");
+                                        if (localConv.getLastMessageSentAt() != mostRecent) {
+                                            Map<String, Object> data = new HashMap<>();
+                                            data.put("lastMessageSentAt", mostRecent);
+                                            db.collection(USER_BRANCH).document(uid).collection(CONVERSATIONS_BRANCH)
+                                                    .document(localConv.getConversationID()).set(data, SetOptions.merge());
+                                        }
+                                    }
+                                }
+                            });
+                    }
+                }
+        });
+    }
+
     /**
      * returns a query to the list of contacts associated with the current user.
      * A Query can be used to fill a recycler view.
