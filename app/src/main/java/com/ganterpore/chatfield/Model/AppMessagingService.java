@@ -7,6 +7,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 import com.ganterpore.chatfield.Controller.AccountController;
 import com.ganterpore.chatfield.R;
@@ -20,6 +21,8 @@ import com.google.firebase.messaging.RemoteMessage;
 
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -119,6 +122,14 @@ public class AppMessagingService extends FirebaseMessagingService {
         data.put("contactID", contactID);
 
         FirebaseFunctions.getInstance().getHttpsCallable("acceptContact").call(data);
+    }
+
+    public static void createGroupChat(String chatName, ArrayList<String> members) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", chatName);
+        data.put("users", members);
+        data.put("nMembers", members.size());
+        FirebaseFunctions.getInstance().getHttpsCallable("createGroupChat").call(data);
     }
 
     @Override

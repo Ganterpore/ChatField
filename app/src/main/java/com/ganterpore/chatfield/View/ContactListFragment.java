@@ -26,6 +26,9 @@ import com.google.firebase.firestore.Query;
 public class ContactListFragment extends Fragment {
     private AccountController accountController;
 
+    private static final String SHOW_REQUESTS = "showRequests";
+    private boolean showRequests;
+
     private FirestoreRecyclerAdapter<Contact, ContactListViewHolder> contactsAdapter;
 
     private View view;
@@ -37,14 +40,23 @@ public class ContactListFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static ContactListFragment newInstance(){
-        return new ContactListFragment();
+    public static ContactListFragment newInstance(boolean showRequests){
+        ContactListFragment fragment = new ContactListFragment();
+        Bundle args = new Bundle();
+        args.putBoolean(SHOW_REQUESTS, showRequests);
+        fragment.setArguments(args);
+
+        return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         accountController = AccountController.getInstance();
+
+        if(getArguments() != null) {
+            showRequests = getArguments().getBoolean(SHOW_REQUESTS);
+        }
     }
 
     @Override
@@ -52,7 +64,10 @@ public class ContactListFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_contact_list, container, false);
-        displayContacts();
+        buildContactsList();
+        if(showRequests) {
+            buildRequestsList();
+        }
         return view;
     }
 
@@ -78,28 +93,65 @@ public class ContactListFragment extends Fragment {
     public void onStart() {
         super.onStart();
         contactsAdapter.startListening();
-        requestsAdapter.startListening();
+        if(showRequests) {
+            requestsAdapter.startListening();
+        }
     }
 
     @Override
     public void onStop() {
         super.onStop();
         contactsAdapter.stopListening();
-        requestsAdapter.stopListening();
+        if(showRequests) {
+            requestsAdapter.stopListening();
+        }
     }
 
-    private void displayContacts() {
+    private void buildRequestsList() {
+        RecyclerView allRequests = view.findViewById(R.id.request_list_all);
+
+        Query requests = accountController.getRequests();
+
+        FirestoreRecyclerOptions<Account> requestOptions = new FirestoreRecyclerOptions.Builder<Account>()
+                .setQuery(requests, Account.class).build();
+
+        requestsAdapter = new FirestoreRecyclerAdapter<Account, RequestListViewHolder>(requestOptions) {
+            @Override
+            protected void onBindViewHolder(@NonNull RequestListViewHolder holder, int position, @NonNull Account model) {
+                holder.initialiseDisplay(model);
+            }
+
+            @NonNull
+            @Override
+            public RequestListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+                View view = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.request_list_item, parent, false);
+
+                return createRequestListViewHolder(view);
+            }
+
+            @Override
+            public void onDataChanged() {
+                if(getItemCount() == 0) {
+                    showRequests(false);
+                } else {
+                    showRequests(true);
+                }
+            }
+        };
+        requestsAdapter.notifyDataSetChanged();
+        allRequests.setAdapter(requestsAdapter);
+    }
+
+    private void buildContactsList() {
         //Tell the recycler view to display results as a list
         RecyclerView allContacts = view.findViewById(R.id.contact_list_all);
-        RecyclerView allRequests = view.findViewById(R.id.request_list_all);
 
         //Query the database for contacts and project the results onto the RecyclerView
         Query contacts = accountController.getContacts();
-        Query requests = accountController.getRequests();
+
         FirestoreRecyclerOptions<Contact> contactOptions = new FirestoreRecyclerOptions.Builder<Contact>()
                 .setQuery(contacts, Contact.class).build();
-        FirestoreRecyclerOptions<Account> requestOptions = new FirestoreRecyclerOptions.Builder<Account>()
-                .setQuery(requests, Account.class).build();
 
         contactsAdapter = new FirestoreRecyclerAdapter<Contact, ContactListViewHolder>(contactOptions) {
             @NonNull
@@ -108,7 +160,7 @@ public class ContactListFragment extends Fragment {
                 View view = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.contact_list_item, parent, false);
 
-                return new ContactListViewHolder(view);
+                return createContactListViewHolder(view);
             }
 
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -123,33 +175,6 @@ public class ContactListFragment extends Fragment {
             }
         };
 
-        requestsAdapter = new FirestoreRecyclerAdapter<Account, RequestListViewHolder>(requestOptions) {
-            @Override
-            protected void onBindViewHolder(@NonNull RequestListViewHolder holder, int position, @NonNull Account model) {
-                holder.initialiseDisplay(model);
-            }
-
-            @NonNull
-            @Override
-            public RequestListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                View view = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.request_list_item, parent, false);
-
-                return new RequestListViewHolder(view);
-            }
-
-            @Override
-            public void onDataChanged() {
-                if(getItemCount() == 0) {
-                    showRequests(false);
-                } else {
-                    showRequests(true);
-                }
-            }
-        };
-        requestsAdapter.notifyDataSetChanged();
-        allRequests.setAdapter(requestsAdapter);
-
         contactsAdapter.notifyDataSetChanged();
         allContacts.setAdapter(contactsAdapter);
     }
@@ -157,7 +182,7 @@ public class ContactListFragment extends Fragment {
     private void showRequests(boolean show) {
         TextView requestTitle = view.findViewById(R.id.requests_title);
         RecyclerView requests = view.findViewById(R.id.request_list_all);
-        if(show) {
+        if(show && showRequests) {
             requestTitle.setVisibility(View.VISIBLE);
             requests.setVisibility(View.VISIBLE);
         } else {
@@ -168,6 +193,10 @@ public class ContactListFragment extends Fragment {
 
     public interface OnFragmentInteractionListener {
         void onContactSelected(Contact contact);
+    }
+
+    public ContactListViewHolder createContactListViewHolder(View view) {
+        return new ContactListViewHolder(view);
     }
 
     public class ContactListViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -197,14 +226,6 @@ public class ContactListFragment extends Fragment {
             //XML fragments
             TextView contactNameView = itemView.findViewById(R.id.list_contact_name);
             contactNameView.setText(contact.getFirstname() + " " + contact.getLastname());
-//            Button messageButton = itemView.findViewById(R.id.contact_message_button);
-//            messageButton.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                //Begin a chat with a user after clicking the messageButton
-//                public void onClick(View view) {
-//                    openChat(view);
-//                }
-//            });
 
         }
 
@@ -213,26 +234,13 @@ public class ContactListFragment extends Fragment {
             selectContact(v);
         }
 
-        /**
-         * Opens a chat when clicked
-         * @param v View for context
-         */
-        private void openChat(View v) {
-//            Intent intent = new Intent(context, ChatActivity.class);
-//            intent.putExtra(CONVERSATION_ID, conversationID);
-//            intent.putExtra(ChatActivity.CONTACT_ID, contactID);
-//            intent.putExtra("needHelp", needHelp);
-//            intent.putExtra("name", contactName);
-//            context.startActivity(intent);
-        }
-
         private void selectContact(View v) {
-//            Intent intent = new Intent(context, AccountInfoActivity.class);
-//            intent.putExtra("contact", contactID);
-//            intent.putExtra("conversationID", conversationID);
-//            startActivity(intent);
             mListener.onContactSelected(contact);
         }
+    }
+
+    public RequestListViewHolder createRequestListViewHolder(View view) {
+        return new RequestListViewHolder(view);
     }
 
     private class RequestListViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{

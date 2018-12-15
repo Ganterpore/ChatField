@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
@@ -14,9 +15,11 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.ganterpore.chatfield.Controller.AccountController;
+import com.ganterpore.chatfield.Model.AppMessagingService;
 import com.ganterpore.chatfield.Model.Contact;
 import com.ganterpore.chatfield.R;
 
@@ -28,7 +31,7 @@ public class MainActivity extends AppCompatActivity
         ChatListFragment.OnFragmentInteractionListener {
 
     private TextView mTextMessage;
-    private int currentView;
+    private int currentView=-1;
 
     private AccountController accountController;
 
@@ -71,8 +74,6 @@ public class MainActivity extends AppCompatActivity
         mTextMessage = (TextView) findViewById(R.id.message);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-
-        openChats();
     }
 
     @Override
@@ -82,6 +83,26 @@ public class MainActivity extends AppCompatActivity
             startActivity(new Intent(this, LoginActivity.class));
         } else {
             this.accountController = AccountController.getInstance();
+            if(currentView == -1) {
+                openChats();
+                currentView = R.id.navigation_chats;
+            }
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        switch (currentView) {
+            case R.id.navigation_chats:
+                openChats();
+                break;
+            case R.id.navigation_contacts:
+                openContacts();
+                break;
+            case R.id.navigation_account:
+                openAccount();
+                break;
         }
     }
 
@@ -111,11 +132,10 @@ public class MainActivity extends AppCompatActivity
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-        ContactListFragment contactList = ContactListFragment.newInstance();
+        ContactListFragment contactList = ContactListFragment.newInstance(true);
         fragmentTransaction.replace(R.id.screen_content, contactList);
         fragmentTransaction.commit();
 
-        //TODO add animation
         FloatingActionButton addContactButton = findViewById(R.id.add_contact);
         addContactButton.show();
         onScreenViews.add(addContactButton);
@@ -129,6 +149,11 @@ public class MainActivity extends AppCompatActivity
 
         fragmentTransaction.replace(R.id.screen_content, chatListFragment);
         fragmentTransaction.commit();
+
+
+        FloatingActionButton createGroupChatButton = findViewById(R.id.create_chat);
+        createGroupChatButton.show();
+        onScreenViews.add(createGroupChatButton);
     }
 
     public void addContact(View view) {
@@ -149,6 +174,37 @@ public class MainActivity extends AppCompatActivity
         });
         //displaying the dialogue to the UI
         addContactAlert.create().show();
+    }
+
+    public void createGroup(View view) {
+        LayoutInflater layoutInflater = LayoutInflater.from(this);
+        //TODO fix crash that occurs when openned a second time
+        final View contactListLayout = layoutInflater.inflate(R.layout.create_group_dialog_box, null);
+        final ContactSelector contactSelector = (ContactSelector) getSupportFragmentManager().findFragmentById(R.id.selector_fragment);
+//        final ContactSelector contactSelector = new ContactSelector();
+//        FragmentTransaction fragmentTransaction = contactSelector.getChildFragmentManager().beginTransaction();
+//        FragmentTransaction fragmentTransaction = contactSelector.getFragmentManager().beginTransaction();
+//        fragmentTransaction.add(R.id.selector_fragment, contactSelector);
+//        fragmentTransaction.commit();
+
+
+        AlertDialog.Builder createGroupAlert = new AlertDialog.Builder(this);
+        createGroupAlert.setTitle("Create Group Chat");
+        createGroupAlert.setView(contactListLayout);
+        createGroupAlert.setNegativeButton("Cancel", null);
+        createGroupAlert.setPositiveButton("Create", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                ArrayList<String> selectedContacts = contactSelector.getSelectedContacts();
+                if(!selectedContacts.contains(accountController.getUid())) {
+                    selectedContacts.add(accountController.getUid());
+                }
+                EditText groupName = contactListLayout.findViewById(R.id.enter_chat_name);
+                AppMessagingService.createGroupChat(groupName.getText().toString(), selectedContacts);
+            }
+        });
+        createGroupAlert.create().show();
+
     }
 
     @Override

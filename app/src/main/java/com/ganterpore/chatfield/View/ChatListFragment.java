@@ -23,11 +23,14 @@ import com.ganterpore.chatfield.R;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import static com.ganterpore.chatfield.View.ChatActivity.CONVERSATION_ID;
 
 public class ChatListFragment extends Fragment {
+    //TODO add ability to refresh
     private AccountController accountController;
 
     private FirestoreRecyclerAdapter<Chat, ChatListViewHolder> chatAdapter;
@@ -157,7 +160,8 @@ public class ChatListFragment extends Fragment {
 
             conversationName.setText(conversation.getName());
             Date sentAt = new Date(conversation.getLastMessageSentAt());
-            lastSentAtTime.setText(sentAt.toString());
+            SimpleDateFormat formatter = new SimpleDateFormat("d/MM/yyyy hh:mm a", Locale.getDefault());
+            lastSentAtTime.setText(formatter.format(sentAt));
 
             if(!conversation.isSeen()) {
                 conversationName.setTypeface(null, Typeface.BOLD);

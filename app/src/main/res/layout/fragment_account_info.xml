@@ -85,17 +85,6 @@
         app:layout_constraintTop_toBottomOf="@+id/number" />
 
     <TextView
-        android:id="@+id/helper"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
-        android:textStyle="bold"
-        android:text="Helper?:"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/bio_field" />
-
-    <TextView
         android:id="@+id/firstname_field"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -143,15 +132,6 @@
         app:layout_constraintStart_toEndOf="@id/bio"
         app:layout_constraintTop_toBottomOf="@id/bio"
         app:layout_constraintEnd_toEndOf="parent"/>
-
-    <TextView
-        android:id="@+id/is_helper_field"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:text="helper?"
-        app:layout_constraintStart_toEndOf="@id/helper"
-        app:layout_constraintBaseline_toBaselineOf="@+id/helper" />
 
     <Button
         android:id="@+id/logout"

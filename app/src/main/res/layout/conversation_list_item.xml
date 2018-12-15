@@ -24,7 +24,7 @@
         app:layout_constraintBaseline_toBaselineOf="@+id/conversation_name"
         app:layout_goneMarginEnd="8dp"
         android:textStyle="normal"
-        android:textSize="20sp"/>
+        android:textSize="12sp"/>
 
     <View
         android:id="@+id/divider"

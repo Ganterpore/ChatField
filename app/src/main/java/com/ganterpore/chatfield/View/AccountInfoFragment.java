@@ -111,7 +111,6 @@ public class AccountInfoFragment extends Fragment {
         number = view.findViewById(R.id.number_field);
         bio = view.findViewById(R.id.bio_field);
         username = view.findViewById(R.id.username);
-        helperView = view.findViewById(R.id.is_helper_field);
 
         Button logoutButton = view.findViewById(R.id.logout);
         Button updateButton = view.findViewById(R.id.update_details);

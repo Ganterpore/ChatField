@@ -322,8 +322,8 @@ public class AccountController {
                 .collection(USER_BRANCH)
                 .document(uid)
                 .collection(CONVERSATIONS_BRANCH)
-                .orderBy("lastMessageSentAt");
-        //TODO update conversation last sent at when method is called.
+                .orderBy("lastMessageSentAt", Query.Direction.DESCENDING);
+        //TODO update conversation last sent at and other things when method is called.
         updateConversations(conversations);
         return conversations;
     }
