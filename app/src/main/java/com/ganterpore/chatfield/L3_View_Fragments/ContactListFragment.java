@@ -1,4 +1,4 @@
-package com.ganterpore.chatfield.View;
+package com.ganterpore.chatfield.L3_View_Fragments;
 
 import android.content.Context;
 import android.os.Build;
@@ -16,9 +16,9 @@ import android.widget.TextView;
 
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
-import com.ganterpore.chatfield.Controller.AccountController;
-import com.ganterpore.chatfield.Model.Account;
-import com.ganterpore.chatfield.Model.Contact;
+import com.ganterpore.chatfield.L2_Controllers.AccountController;
+import com.ganterpore.chatfield.Models.Account;
+import com.ganterpore.chatfield.Models.Contact;
 import com.ganterpore.chatfield.R;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;

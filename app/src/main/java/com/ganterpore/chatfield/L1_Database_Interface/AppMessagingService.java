@@ -1,4 +1,4 @@
-package com.ganterpore.chatfield.Model;
+package com.ganterpore.chatfield.L1_Database_Interface;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -7,22 +7,18 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 
-import com.ganterpore.chatfield.Controller.AccountController;
+import com.ganterpore.chatfield.L2_Controllers.AccountController;
 import com.ganterpore.chatfield.R;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.functions.FirebaseFunctions;
-import com.google.firebase.functions.HttpsCallableResult;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 

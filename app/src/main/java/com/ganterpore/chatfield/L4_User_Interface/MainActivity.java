@@ -1,4 +1,4 @@
-package com.ganterpore.chatfield.View;
+package com.ganterpore.chatfield.L4_User_Interface;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
@@ -15,12 +14,14 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 
-import com.ganterpore.chatfield.Controller.AccountController;
-import com.ganterpore.chatfield.Model.AppMessagingService;
-import com.ganterpore.chatfield.Model.Contact;
+import com.ganterpore.chatfield.L2_Controllers.AccountController;
+import com.ganterpore.chatfield.L1_Database_Interface.AppMessagingService;
+import com.ganterpore.chatfield.Models.Contact;
+import com.ganterpore.chatfield.L3_View_Fragments.AccountInfoFragment;
+import com.ganterpore.chatfield.L3_View_Fragments.ChatListFragment;
+import com.ganterpore.chatfield.L3_View_Fragments.ContactListFragment;
 import com.ganterpore.chatfield.R;
 
 import java.util.ArrayList;

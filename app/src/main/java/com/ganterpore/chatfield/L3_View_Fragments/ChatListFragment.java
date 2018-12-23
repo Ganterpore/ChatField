@@ -1,12 +1,10 @@
-package com.ganterpore.chatfield.View;
+package com.ganterpore.chatfield.L3_View_Fragments;
 
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -17,9 +15,10 @@ import android.widget.TextView;
 
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
-import com.ganterpore.chatfield.Controller.AccountController;
-import com.ganterpore.chatfield.Model.Chat;
+import com.ganterpore.chatfield.L2_Controllers.AccountController;
+import com.ganterpore.chatfield.Models.Chat;
 import com.ganterpore.chatfield.R;
+import com.ganterpore.chatfield.L4_User_Interface.ChatActivity;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 
@@ -27,7 +26,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import static com.ganterpore.chatfield.View.ChatActivity.CONVERSATION_ID;
+import static com.ganterpore.chatfield.L4_User_Interface.ChatActivity.CONVERSATION_ID;
 
 public class ChatListFragment extends Fragment {
     //TODO add ability to refresh

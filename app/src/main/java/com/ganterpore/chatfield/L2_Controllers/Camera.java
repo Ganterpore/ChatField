@@ -1,4 +1,4 @@
-package com.ganterpore.chatfield.Controller;
+package com.ganterpore.chatfield.L2_Controllers;
 
 import android.app.Activity;
 import android.content.Intent;

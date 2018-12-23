@@ -1,13 +1,11 @@
-package com.ganterpore.chatfield.View;
+package com.ganterpore.chatfield.L4_User_Interface;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 

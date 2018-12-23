@@ -1,4 +1,4 @@
-package com.ganterpore.chatfield.View;
+package com.ganterpore.chatfield.L3_View_Fragments;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -13,7 +13,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,9 +23,8 @@ import android.widget.Toast;
 
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
-import com.ganterpore.chatfield.Controller.ChatController;
-import com.ganterpore.chatfield.Model.Chat;
-import com.ganterpore.chatfield.Model.Message;
+import com.ganterpore.chatfield.L2_Controllers.ChatController;
+import com.ganterpore.chatfield.Models.Message;
 import com.ganterpore.chatfield.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;

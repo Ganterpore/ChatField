@@ -1,31 +1,26 @@
-package com.ganterpore.chatfield.View;
+package com.ganterpore.chatfield.L3_View_Fragments;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.ganterpore.chatfield.Controller.AccountController;
-import com.ganterpore.chatfield.Model.Account;
+import com.ganterpore.chatfield.L2_Controllers.AccountController;
+import com.ganterpore.chatfield.Models.Account;
 import com.ganterpore.chatfield.R;
+import com.ganterpore.chatfield.L4_User_Interface.ConfigureUserActivity;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 
 import static android.app.Activity.RESULT_OK;
 

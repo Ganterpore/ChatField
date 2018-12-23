@@ -1,14 +1,14 @@
-package com.ganterpore.chatfield.View;
+package com.ganterpore.chatfield.L4_User_Interface;
 
 import android.content.Intent;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import com.ganterpore.chatfield.Controller.Camera;
+import com.ganterpore.chatfield.L2_Controllers.Camera;
+import com.ganterpore.chatfield.L3_View_Fragments.ChatFragment;
 import com.ganterpore.chatfield.R;
 
 import java.io.File;

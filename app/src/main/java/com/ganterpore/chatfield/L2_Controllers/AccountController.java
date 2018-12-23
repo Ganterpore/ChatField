@@ -1,14 +1,14 @@
-package com.ganterpore.chatfield.Controller;
+package com.ganterpore.chatfield.L2_Controllers;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.ganterpore.chatfield.Model.Account;
-import com.ganterpore.chatfield.Model.AppMessagingService;
-import com.ganterpore.chatfield.Model.Chat;
-import com.ganterpore.chatfield.Model.Contact;
+import com.ganterpore.chatfield.Models.Account;
+import com.ganterpore.chatfield.L1_Database_Interface.AppMessagingService;
+import com.ganterpore.chatfield.Models.Chat;
+import com.ganterpore.chatfield.Models.Contact;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
