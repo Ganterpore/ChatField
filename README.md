@@ -11,26 +11,26 @@ This is where the actual data is stored for the app. It uses a NoSQL Firebase Fi
 Using just the code from this layer will allow the creation of a non-android app to interact with the chat structure. This is currently not very portable however, as the structure is mainly built from higher levels.
 
 #### Database Design
-insert image showing the noSQL design of the DB
+![Database Design image](/database%20design.png)
 
-#### Database Functions
+#### [Database Functions](functions/index.js)
 link to the functions, and descriptions of them
 
-### L1: Database Interface
+### L1: [Database Interface](app/src/main/java/com/ganterpore/chatfield/L1_Database_Interface)
 This layer contains classes which directly interact with the database and server, and therefore controls the available interactions. There are the visible classes written for this project, however this layer also contains the imported firebase layers. In general the higher level user layers should not interact with this layer directly, and instead go through Controllers.
 
-### L2: Controllers
+### L2: [Controllers](app/src/main/java/com/ganterpore/chatfield/L2_Controllers)
 The Controllers layer describes the way the application should and does interact with the database. All interactions with the database by the application should go through this layer, and this will control what types of interactions are possible. This is everythng from sending messages, to creating new accounts. This layer also describes how the application interacts directly with the phone, for things like accessing the camera and other basic features.
 
 By copying this and the lower layers, a new app could be created with a different user interface, that has the same chatting and account functionality.
 
-### L3: View Fragments
+### L3: [View Fragments](app/src/main/java/com/ganterpore/chatfield/L3_View_Fragments)
 This layer contains UI fragments which are reused throughout the code. For example the chat page, contacts page etc. By copying the elements in this layer and lower, you can add the generic chat elements to your own app, without needing to design the UI yourself, or do the backend work.
 
-### L4: User Interface
+### L4: [User Interface](app/src/main/java/com/ganterpore/chatfield/L4_User_Interface)
 This the layer for the user interface for this individual application. It contains example uses of how an app can be made using the other elements, and builds a simple chat application.
 
-### Models
+### [Models](app/src/main/java/com/ganterpore/chatfield/Models)
 The Models layer contains all the Data types used by the database and the code, for example conversations, accounts messages etc.
 
 ## Set Up
