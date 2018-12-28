@@ -1,4 +1,4 @@
-package com.ganterpore.chatfield.Model;
+package com.ganterpore.chatfield.Models;
 
 import com.google.firebase.firestore.DocumentSnapshot;
 

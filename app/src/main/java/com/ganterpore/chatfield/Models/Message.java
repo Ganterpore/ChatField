@@ -1,4 +1,4 @@
-package com.ganterpore.chatfield.Model;
+package com.ganterpore.chatfield.Models;
 
 public class Message {
     public static final int TEXT_TYPE = 0;

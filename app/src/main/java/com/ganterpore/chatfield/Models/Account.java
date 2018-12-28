@@ -1,6 +1,4 @@
-package com.ganterpore.chatfield.Model;
-
-import android.util.Log;
+package com.ganterpore.chatfield.Models;
 
 import com.google.firebase.firestore.DocumentSnapshot;
 
