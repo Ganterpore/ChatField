@@ -34,5 +34,8 @@ This the layer for the user interface for this individual application. It contai
 The Models layer contains all the Data types used by the database and the code, for example conversations, accounts messages etc.
 
 ## Set Up
+###Prerequisites
+First make sure that both git and Android Studio are installed on your computer.
+
 //design once I have a new computer to set up on.
 
