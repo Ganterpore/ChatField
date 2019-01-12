@@ -33,14 +33,17 @@ This the layer for the user interface for this individual application. It contai
 ### [Models](app/src/main/java/com/ganterpore/chatfield/Models)
 The Models layer contains all the Data types used by the database and the code, for example conversations, accounts messages etc.
 
-## Set Up
+## Set Up Android Code
 ### Prerequisites
 First make sure that both git and Android Studio are installed on your computer.
 
 ### Step 1
-Call "git clone https://github.com/Ganterpore/ChatField" into your local directory
+Open Android studio, Select File -> New -> project from version control -> git, then fill in the url "https://github.com/Ganterpore/ChatField" 
 
-### Step 2
-Open the project in Android Studio, and allow it to sync the project.
-Next, click the hammer icon to build the project.
+And its as easy as that! from here you should be able to run the code on an android phone or an emulator, and edit the code however you like!
+
+## Set up Firebase Functions
+You should already have the code in the file "/functions/index.js" when you cloned the project. However, there is no access to update or change the functions on the firebase.
+
+//firebase functions set up
 
