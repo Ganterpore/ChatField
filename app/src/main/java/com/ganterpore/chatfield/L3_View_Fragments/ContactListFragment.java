@@ -209,7 +209,7 @@ public class ContactListFragment extends Fragment {
          * Public Constructor
          * @param itemView The individual person record inside the recycler view
          */
-        ContactListViewHolder(View itemView) {
+        public ContactListViewHolder(View itemView) {
             super(itemView);
             this.itemView = itemView;
             this.context = itemView.getContext();
