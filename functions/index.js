@@ -9,31 +9,31 @@ exports.addContact = functions.https.onCall((data, context) => {
  	const senderFirstname = data.firstname;
  	const senderLastname = data.lastname;
  	const senderEmail = data.email;
- 	
+
  	const receiverEmail = data.receiverEmail;
- 	
+
  	//finding user with the contact request emai
  	return admin.firestore().collection('user')
  		.where('email', '==', receiverEmail).get().then(querySnapshot => {
- 			querySnapshot.forEach(documentSnapshot => {
+ 			return querySnapshot.forEach(documentSnapshot => {
  					const receiverID = documentSnapshot.get('userID');
  					console.log('receiverID is ', receiverID);
- 					
+
  					//adding request to recievers requests
  					admin.firestore().doc(`user/${receiverID}/requests/${senderID}`)
  							.set({
  									email: senderEmail,
  									firstname: senderFirstname,
- 									lastname: senderLastname, 
+ 									lastname: senderLastname,
  									userID: senderID
  							});
- 					
+
  					//getting the application token for the user from the database
  					return admin.firestore().doc(`tokens/${receiverID}`)
  						.get().then(documentSnapshot => {
  								const token = documentSnapshot.get('token');
  								console.log('notification being sent to ', token);
- 								
+
  								//creating notification to be sent
  								const notif = {
  									notification: {
@@ -48,7 +48,7 @@ exports.addContact = functions.https.onCall((data, context) => {
  										email: senderEmail,
  									},
  								};
- 								
+
  								//sending request notification to given token
  								return admin.messaging().sendToDevice(token, notif);
  						});
@@ -59,7 +59,7 @@ exports.addContact = functions.https.onCall((data, context) => {
 exports.sendNotificationToUser = functions.https.onCall((data, context) => {
 		const notif = data.notification;
 		const receiverID = data.userID;
-		
+
 		return admin.firestore().doc(`tokens/${receiverID}`).get()
 			.then(documentSnapshot => {
 					const token = documentSnapshot.get('token');
@@ -75,7 +75,7 @@ exports.acceptContact = functions.https.onCall((data, context) => {
 		//getting the passed information
 		const uid = context.auth.uid;
 		const contactID = data.contactID;
-		
+
 		//creating a chat between users
 		console.log('creating chat ');
 		//const chat = {user1ID: uid, user2ID: contactID, user1Seen: false, user2Seen:false};
@@ -85,19 +85,19 @@ exports.acceptContact = functions.https.onCall((data, context) => {
 		}
 		const newConv = admin.firestore().collection(`conversations`)
 			.add(chat);
-			
+
 		return newConv.then(documentReference => {
 			const conversationid = documentReference.id;
 			console.log('chat ', conversationid, 'created');
-		
+
 			console.log('getting request data');
 			//finding the contact request assosciated with the contactID from the database
 			const contactRequest = admin.firestore().doc(`user/${uid}/requests/${contactID}`);
 			return contactRequest.get().then(documentSnapshot => {
-				console.log(uid, ' adding contact ', contactID, 
-					documentSnapshot.get('firstname'), documentSnapshot.get('lastname'), 
+				console.log(uid, ' adding contact ', contactID,
+					documentSnapshot.get('firstname'), documentSnapshot.get('lastname'),
 					documentSnapshot.get('email'), conversationid);
-				
+
 				//getting contact data from the contact request, and new conversationID
 				const contactData = {
 					userID: contactID,
@@ -106,15 +106,15 @@ exports.acceptContact = functions.https.onCall((data, context) => {
 					email: documentSnapshot.get('email'),
 					conversationID: conversationid
 				}
-				
+
 				//adding contact to the requested user
 				admin.firestore().doc(`user/${uid}/contacts/${contactID}`)
 					.set(contactData).then(documentSnapshot => {
 						//removing the contact request
 						console.log('removing request ', contactID);
-						contactRequest.delete();
-				});	
-					
+						return contactRequest.delete();
+				}).catch(error => {});
+
 				//adding the new conversation to both users
 				const conversationData = {
 					name: documentSnapshot.get('firstname') + " " + documentSnapshot.get('lastname'),
@@ -125,7 +125,7 @@ exports.acceptContact = functions.https.onCall((data, context) => {
 				}
 				admin.firestore().doc(`user/${uid}/conversations/${conversationid}`)
 					.set(conversationData);
-				
+
 				console.log('getting contact user');
 				return admin.firestore().doc(`user/${uid}`).get().then(documentSnapshot => {
 					console.log('contact being added on requester side');
@@ -138,7 +138,7 @@ exports.acceptContact = functions.https.onCall((data, context) => {
 						email: documentSnapshot.get('email'),
 						conversationID: conversationid
 					}
-					
+
 					const otherConversationData = {
 						name: documentSnapshot.get('firstname') + " " + documentSnapshot.get('lastname'),
 						lastMessageSentAt: Date.now(),
@@ -146,10 +146,10 @@ exports.acceptContact = functions.https.onCall((data, context) => {
 						type: "contact",
 						seen:false
 					}
-					
+
 					admin.firestore().doc(`user/${contactID}/conversations/${conversationid}`)
 					.set(otherConversationData);
-					
+
 					//getting application token assosciated with the requester
 					admin.firestore().doc(`tokens/${contactID}`).get()
 						.then(documentSnapshot => {
@@ -165,10 +165,10 @@ exports.acceptContact = functions.https.onCall((data, context) => {
  								};
  								//sending notification
  								return admin.messaging().sendToDevice(token, notif);
- 						});
+ 						}).catch(error => {});
 					//adding the contact on the requesters side
 					return admin.firestore().doc(`user/${contactID}/contacts/${uid}`)
-						.set(userData);	
+						.set(userData);
 					});
 				});
 		});
@@ -179,12 +179,12 @@ exports.createGroupChat = functions.https.onCall((data, context) => {
 	const name = data.name;
 	const memberIds = data.users;
 	const nMembers = data.nMembers;
-	
+
 	var seen = [];
 	for(var i=0;i<nMembers;i++) {
 		seen[i] = false;
 	}
-	
+
 	//building chat on database
 	const chatOnline = {
 		name:name,
@@ -195,7 +195,7 @@ exports.createGroupChat = functions.https.onCall((data, context) => {
 		.add(chatOnline).then(documentReference => {
 			const conversationid = documentReference.id;
 			console.log('chat ', conversationid, 'created');
-			
+
 			//adding chat locally
 			const chatLocal = {
 				conversationID: conversationid,
@@ -204,12 +204,13 @@ exports.createGroupChat = functions.https.onCall((data, context) => {
 				seen: false,
 				name:name
 			}
-			
+
 			for(var i=0;i<memberIds.length;i++) {
 				const memberId = memberIds[i];
 				admin.firestore().doc(`user/${memberId}/conversations/${conversationid}`)
 						.set(chatLocal);
 			}
+			return;
 		});
 });
 
@@ -219,14 +220,14 @@ exports.messageNotification = functions.firestore
 		const messageDoc = snapshot.data();
 		const conversationID = context.params.conversationID;
 		console.log('recieved message: ', messageDoc.message);
-	
+
 		return admin.firestore().doc(`conversations/${conversationID}`).get()
 			.then(documentSnapshot => {
 				conversationDoc = documentSnapshot.data();
 				const nUsers = conversationDoc.users.length;
 				const senderIndex = conversationDoc.users.indexOf(messageDoc.userID);
 				var seenArray = new Array(nUsers);
-				
+
 				const notif = {
 					notification: {
 						title: "Message received",
@@ -237,15 +238,15 @@ exports.messageNotification = functions.firestore
 						conversationID: conversationID
 					}
 				}
-				
+
 				//set all to unseen, except the sender
 				var i;
 				for(i=0;i<nUsers;i++) {
-					if(i == senderIndex) {
+					if(i === senderIndex) {
 						seenArray[i] = true;
 					} else {
 						seenArray[i] = false;
-						
+
 						//sending notification to user
 						const receiverID = conversationDoc.users[i]
 						admin.firestore().doc(`tokens/${receiverID}`).get()
@@ -254,12 +255,12 @@ exports.messageNotification = functions.firestore
 								console.log('notification being sent to ', token);
 
 								//sending notification
-								admin.messaging().sendToDevice(token, notif);
-						});
+								return admin.messaging().sendToDevice(token, notif);
+						}).catch(error => {});
 					}
 				}
-				
-				admin.firestore().doc(`conversations/${conversationID}`).set({
+
+				return admin.firestore().doc(`conversations/${conversationID}`).set({
 							seen: seenArray
 						}, {merge: true});
 			});
