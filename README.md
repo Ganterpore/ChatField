@@ -62,12 +62,12 @@ run "npm install -g eslint"<br/>
 Next cd into your local folder, here you can initialise your local remote to firebase.<br/>
 run "npm init"<br/>
 if you have not yet used firebase, run "firebase login"<br/>
-run "firebase init"<br/>
+run "firebase init"
   - choose Functions when prompted which features to run
-  - when prompted, select the Firebase project you created for this project
+  - when prompted, select the Firebase project you created for this project as your default.
   - choose JavaScript as your default language
-  - make your own choices for the other options
-  - DO NOT overwrite the index.js file, this has all the functions we will use<br/>
+  - DO NOT overwrite the index.js file, this has all the functions we will use
+  - make your own choices for the other options<br/>
 This will create a file called package.json<br/>
 run "firebase deploy"<br/>
 If you get the "No such File or Directory error ... $RESOURCE_DIR\package.json" you may need to open your firebase.json file, and update the predeploy to ""predeploy": ["npm --prefix \"%RESOURCE_DIR%\" run lint"]", it should then work.<br/>
