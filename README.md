@@ -55,22 +55,22 @@ Open Firebase Console on your browser and select the project you just started. Y
 ### Step 4
 open command prompt.
 
-first you must install the required global tools.
-run "npm install -g firebase-tools"
-run "npm install -g eslint"
+first you must install the required global tools.<br/>
+run "npm install -g firebase-tools"<br/>
+run "npm install -g eslint"<br/>
 
-Next cd into your local folder, here you can initialise your local remote to firebase.
-run "npm init"
-if you have not yet used firebase, run "firebase login"
-run "firebase init"
+Next cd into your local folder, here you can initialise your local remote to firebase.<br/>
+run "npm init"<br/>
+if you have not yet used firebase, run "firebase login"<br/>
+run "firebase init"<br/>
   - choose Functions when prompted which features to run
   - when prompted, select the Firebase project you created for this project
   - choose JavaScript as your default language
   - make your own choices for the other options
-  - DO NOT overwrite the index.js file, this has all the functions we will use
-This will create a file called package.json
-run "firebase deploy"
-If you get the "No such File or Directory error ... $RESOURCE_DIR\package.json" you may need to open your firebase.json file, and update the predeploy to ""predeploy": ["npm --prefix \"%RESOURCE_DIR%\" run lint"]", it should then work.
+  - DO NOT overwrite the index.js file, this has all the functions we will use<br/>
+This will create a file called package.json<br/>
+run "firebase deploy"<br/>
+If you get the "No such File or Directory error ... $RESOURCE_DIR\package.json" you may need to open your firebase.json file, and update the predeploy to ""predeploy": ["npm --prefix \"%RESOURCE_DIR%\" run lint"]", it should then work.<br/>
 
 Now the functions should be uploaded to your Firebase.
 
