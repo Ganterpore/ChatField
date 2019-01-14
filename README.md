@@ -72,7 +72,7 @@ run "firebase init"
 
 This will create a file called package.json<br/>
 run "firebase deploy"<br/>
-If you get the "No such File or Directory error ... $RESOURCE_DIR\package.json" you may need to open your firebase.json file, and update the predeploy to ""predeploy": ["npm --prefix \"%RESOURCE_DIR%\" run lint"]", it should then work.<br/>
+If you get the "No such File or Directory error ... $RESOURCE_DIR\package.json" you may need to open your firebase.json file, and update $RESOURCE_DIR to %RESOURCE_DIR%, it should then work.<br/>
 
 Now the functions should be uploaded to your Firebase.
 
