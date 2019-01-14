@@ -68,6 +68,8 @@ run "firebase init"
   - choose JavaScript as your default language
   - DO NOT overwrite the index.js file, this has all the functions we will use
   - make your own choices for the other options<br/>
+  
+
 This will create a file called package.json<br/>
 run "firebase deploy"<br/>
 If you get the "No such File or Directory error ... $RESOURCE_DIR\package.json" you may need to open your firebase.json file, and update the predeploy to ""predeploy": ["npm --prefix \"%RESOURCE_DIR%\" run lint"]", it should then work.<br/>
