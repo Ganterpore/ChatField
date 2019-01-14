@@ -35,15 +35,44 @@ The Models layer contains all the Data types used by the database and the code, 
 
 ## Set Up Android Code
 ### Prerequisites
-First make sure that both git and Android Studio are installed on your computer.
+First make sure that the following are installed on your computer:
+ - git
+ - Android Studio
+ - npm/node.js
 
 ### Step 1
 Open Android studio, Select File -> New -> project from version control -> git, then fill in the url "https://github.com/Ganterpore/ChatField" 
 
+### Step 2
+in Android Studio open tools -> Firebase, select Authentication, then select Connect your app to Firebase. Follow the instructions in your browser to connect the code up to your own firebase account. Once you have connected to Firebase you do not need to follow the other steps in Android Studio.
+
+### Step 3
+Open Firebase Console on your browser and select the project you just started. You must enable a few things:
+ - in Authentication enable email/password sign in.
+ - in Database, start a Cloud Firestore databse, select Test mode when prompted
+ - in Storage, simply enable it
+ 
+### Step 4
+open command prompt.
+
+first you must install the required global tools.
+run "npm install -g firebase-tools"
+run "npm install -g eslint"
+
+Next cd into your local folder, here you can initialise your local remote to firebase.
+run "npm init"
+if you have not yet used firebase, run "firebase login"
+run "firebase init"
+  - choose Functions when prompted which features to run
+  - when prompted, select the Firebase project you created for this project
+  - choose JavaScript as your default language
+  - make your own choices for the other options
+  - DO NOT overwrite the index.js file, this has all the functions we will use
+This will create a file called package.json
+run "firebase deploy"
+If you get the "No such File or Directory error ... $RESOURCE_DIR\package.json" you may need to open your firebase.json file, and update the predeploy to ""predeploy": ["npm --prefix \"%RESOURCE_DIR%\" run lint"]", it should then work.
+
+Now the functions should be uploaded to your Firebase.
+
+
 And its as easy as that! from here you should be able to run the code on an android phone or an emulator, and edit the code however you like!
-
-## Set up Firebase Functions
-You should already have the code in the file "/functions/index.js" when you cloned the project. However, there is no access to update or change the functions on the firebase.
-
-//firebase functions set up
-
